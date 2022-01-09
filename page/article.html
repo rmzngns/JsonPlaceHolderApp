@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <nav id="menu"></nav>
+    <div class="container row">
+        <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white col-md-4 " style="width: 380px;">
+                <nav class="navbar navbar-light bg-light">
+                    <div class="input-group">
+                        <input type="search" onkeyup="searchData(event)" class="form-control rounded" placeholder="Search" aria-label="Search"
+                        aria-describedby="search-addon" />
+                      </div>
+                  </nav>
+            <div id="sideBarTitle">
+                <!-- sidebar-->
+            </div>
+        </div>
+        <div  class="col-md-7">
+            <div id="containerArticle"></div>
+            <div id="commentsArticle"></div>
+            
+        </div>
+    </div>
+    <script src="/menu.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous">
+        </script>
+    <script>
+        window.onload = async function () {
+            await loadListData();
+            renderSidebar(postData, usersData);
+            renderContainer(postData);
+        }
+        var postData = [];
+        var usersData = [];
+        var commentsData = [];
+
+
+        const loadListData = async () => {
+            const postResponse = await fetch("https://jsonplaceholder.typicode.com/posts");
+            postData = await postResponse.json();
+            const userResponse = await fetch("https://jsonplaceholder.typicode.com/users");
+            usersData = await userResponse.json();
+            const commentsResponse = await fetch("https://jsonplaceholder.typicode.com/comments");
+            commentsData = await commentsResponse.json();
+            console.log("postData", postData);
+            console.log("usersData", usersData);
+            console.log("commentsData", commentsData);
+        }
+
+
+        const renderSidebar = (postDataSource, usersDataSource) => {
+
+
+            const containerTitle = document.getElementById("sideBarTitle")
+            containerTitle.innerHTML="";
+            postDataSource.forEach(item => {
+                usersDataSource.forEach(element => {
+                    if (item.userId == element.id) {
+                        containerTitle.innerHTML += `  <div class="list-group list-group-flush border-bottom scrollarea">
+                    <button onclick='openArticle(${item?.id})' class="list-group-item list-group-item-action active py-3 lh-tight" aria-current="true">
+                        <div class="d-flex w-100 align-items-center justify-content-between">
+                            <strong class="mb-1">${item.title}</strong>
+                            <small>${element.username}</small>
+                        </div>
+                    </button>
+                </div> `
+                    }
+                });
+
+            });
+        };
+        let selectedItem=[];
+        const containerArticleTitle=(userId)=>{
+
+            selectedItem = usersData.find((x) => x.id == userId);
+            console.log("selectedItem",selectedItem);
+            let cardArticleTitle=`<h5 class="card-title">${selectedItem.name}</h5>`;
+            return cardArticleTitle;
+        }
+
+        const renderContainer = (postDataSource) => {
+           const containerArticle=document.getElementById("containerArticle");
+          containerArticle.innerHTML="";
+           postDataSource.forEach(item => {
+               let userId=item.userId;
+               let cardTitle=containerArticleTitle(userId);
+               console.log("cardTitle",cardTitle);
+            containerArticle.innerHTML += ` <div class="card mb-3">
+                <div class="card-body">
+                    ${cardTitle}
+                    <h4>${item.title}</h4>
+                    <p class="card-text">${item.body}</p>
+                    <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                </div>
+            </div>`;
+           
+           });
+        
+        };
+        const commentArticle=(id)=>{
+            const containerCommentArticle=document.getElementById("commentsArticle");
+            let cData=[];
+            containerCommentArticle.innerHTML="";
+            cData=commentsData.filter((x)=>x.postId==id);
+
+            cData.forEach(item => {
+                containerCommentArticle.innerHTML+=`<div class="mb-3" style="background-color: lightgray;">
+              <div style="color: mediumblue;"><b>Name :</b> ${item.name}</div>
+              <div ><b>Email :</b> ${item.email}</div>
+              <div ><b>Comment :</b> ${item.body}</div></div>`
+                
+            });
+
+        }
+
+
+
+
+        const openArticle = (id) => {
+            let data=[];
+            data=postData.filter((x)=>x.id==id);
+            renderContainer(data);
+            console.log("id",id);
+
+            commentArticle(id);
+        }
+        const searchData=(event)=>{
+            let searchText=event.target.value;
+            const filteredData=postData.filter(x=> new RegExp(searchText,"i").test(x.title));
+            renderSidebar(filteredData,usersData);
+        }
+
+    </script>
+</body>
+
+</html>
