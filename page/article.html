@@ -38,7 +38,7 @@
     <script>
         window.onload = async function () {
             await loadListData();
-            renderSidebar(postData, usersData);
+            renderSidebar(postData);
             renderContainer(postData);
         }
         var postData = [];
@@ -59,16 +59,16 @@
         }
 
 
-        const renderSidebar = (postDataSource, usersDataSource) => {
+        const renderSidebar = (postDataSource) => {
 
 
             const containerTitle = document.getElementById("sideBarTitle")
             containerTitle.innerHTML="";
             postDataSource.forEach(item => {
-                usersDataSource.forEach(element => {
+                usersData.forEach(element => {
                     if (item.userId == element.id) {
                         containerTitle.innerHTML += `  <div class="list-group list-group-flush border-bottom scrollarea">
-                    <button onclick='openArticle(${item?.id})' class="list-group-item list-group-item-action active py-3 lh-tight" aria-current="true">
+                    <button id=item_${item.id} onclick='openArticle(${item?.id})' onchange=changeStatus(${postDataSource.id}) class="list-group-item list-group-item-action  py-3 lh-tight" aria-current="true">
                         <div class="d-flex w-100 align-items-center justify-content-between">
                             <strong class="mb-1">${item.title}</strong>
                             <small>${element.username}</small>
@@ -92,6 +92,17 @@
         const renderContainer = (postDataSource) => {
            const containerArticle=document.getElementById("containerArticle");
           containerArticle.innerHTML="";
+          
+
+          const urlParams = new URLSearchParams(window.location.search);
+          console.log("urlParams",urlParams);
+            const myParam = urlParams.get('id');
+            console.log("myParam",myParam);
+
+            document.getElementById('containerArticle').innerHTML = myParam;
+
+
+
            postDataSource.forEach(item => {
                let userId=item.userId;
                let cardTitle=containerArticleTitle(userId);
@@ -141,6 +152,8 @@
             renderSidebar(filteredData,usersData);
         }
 
+
+        
     </script>
 </body>
 

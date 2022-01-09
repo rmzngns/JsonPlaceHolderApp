@@ -13,7 +13,7 @@
 
 <body>
   <div id="menu"></div>
-  
+
   <div class="accordion" id="accordionExample">
 
   </div>
@@ -38,7 +38,7 @@
 
 
       for (let i = 0; i < 5; i++) {
-       
+
         container.innerHTML += `  <div class="accordion-item">
         <h2 class="accordion-header" id="heading${i}">
           <button
@@ -60,7 +60,7 @@
         >
      
           <div class="accordion-body">
-          ${dataSource[i].body} <button onclick='goToArticle()' class="btn btn-primary" style="float: right" >Detaylar</button>
+          ${dataSource[i].body} <input type="button" style="float: right" value="Detaylar" onclick="store(${i})"/>
          
           
           </div>
@@ -68,21 +68,17 @@
       </div>`
 
       };
-     
-    }
-
-    const goToArticle=()=>{
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams;
 
     }
-   
+    const store = (id) => {
+      var param = id + 1;
+      var url = "http://127.0.0.1:5500/page/article.html?id=" + param.toString();
+      location.href = url;
+    }
+
+
 
   </script>
 </body>
 
 </html>
-
-const myParam = urlParams.get('filename');
-
-document.getElementById('demo').innerHTML = myParam;
